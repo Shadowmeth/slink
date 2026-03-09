@@ -34,13 +34,42 @@ fn read_dir(args: &Vec<String>) -> Vec<String> {
     file_names
 }
 
+fn common_prefix(file_names: &Vec<String>) -> String {
+    let s1 = &file_names[0].as_bytes();
+    let s2 = &file_names[file_names.len() - 1].as_bytes();
+    
+    let mut prefix: String = String::from("");
+    let short_len = if s1.len() < s2.len() {
+        s1.len()
+    } else {
+        s2.len()
+    };
+    
+    for i in 0..short_len {
+        if s1[i] == s2[i] {
+            prefix.push(s1[i] as char);
+        } else {
+            break;
+        }
+    }
+
+    prefix
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         eprintln!("Error. Usage: {} <path>", args[0]);
         exit(1);
     }
-    for file_name in read_dir(&args) {
-        println!("{}", file_name);
+
+    let mut file_names: Vec<String> = read_dir(&args);
+    if file_names.is_empty() {
+        eprintln!("Directory {} is empty. Exiting early...", args[1]);
+        exit(0);
     }
+
+    file_names.sort();
+
+    println!("Common prefix is: {}", common_prefix(&file_names));
 }
